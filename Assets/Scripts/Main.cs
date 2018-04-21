@@ -30,25 +30,25 @@ public static class Main {
                 var dot = em.CreateEntity(DotArchetype);
                 em.SetComponentData(dot, new Translate2D { Value = new float2(-19.20f / 2 + x * 0.1f, -10.80f / 2 + y * 0.1f) });
                 em.SetComponentData(dot, new Scale2D { Value = new float2(0.1f, 0.1f) });
-                //em.AddComponentData(dot, new SinFlow {
-                //    Origin = em.GetComponentData<Translate2D>(dot).Value,
-                //    Phase = new float2(y * 0.23f, x * 0.23f),
-                //    Amplitude = new float2(0.6f, 0.6f),
-                //    Frequency = new float2(3.8f, 3.1f),
-                //});
+                em.AddComponentData(dot, new SinFlow {
+                    Origin = em.GetComponentData<Translate2D>(dot).Value,
+                    Phase = new float2(y * 0.23f, x * 0.23f),
+                    Amplitude = new float2(0.6f, 0.6f),
+                    Frequency = new float2(3.8f, 3.1f + y * 0.02f),
+                });
                 //em.AddComponentData(dot, new NoiseFlow {
                 //    Origin = em.GetComponentData<Translate2D>(dot).Value,
                 //    Phase = new float2(y * 0.1f, x * 0.1f),
                 //    Amplitude = new float2(0.9f, 0.9f),
                 //    Frequency = new float2(2f, 2f),
                 //});
-                em.AddComponentData(dot, new RandomFlow {
-                    Seed = Random.value,
-                    Origin = em.GetComponentData<Translate2D>(dot).Value,
-                    Interval = 0.5f,
-                    MaxAmplitude = 0.8f,
-                    _Time = 2 + Random.value,
-                });
+                //em.AddComponentData(dot, new RandomFlow {
+                //    Seed = Random.value,
+                //    Origin = em.GetComponentData<Translate2D>(dot).Value,
+                //    Interval = 0.5f,
+                //    MaxAmplitude = 0.8f,
+                //    _Time = 2 + Random.value,
+                //});
                 em.AddSharedComponentData(dot, DotRenderer);
             }
         }
