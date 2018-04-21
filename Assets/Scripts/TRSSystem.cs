@@ -43,7 +43,7 @@ public class TRSSystem : JobComponentSystem {
     [Inject] TransformsWithJob transformsWithJob;
 
     protected override JobHandle OnUpdate(JobHandle inputDeps) {
-        var trs = transformsWithJob.Schedule(transformsWithJob.Length, 1, inputDeps);
+        var trs = transformsWithJob.Schedule(transformsWithJob.Length, 64, inputDeps);
         return trs;
     }
 }

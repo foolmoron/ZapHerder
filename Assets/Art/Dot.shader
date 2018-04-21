@@ -7,6 +7,8 @@
 		_HueInterval ("Hue Interval", Range(0, 10)) = 1
 		_HueSteps ("Hue Steps", Range(1, 36)) = 10
 		_InstanceOffsetAmplitude ("InstanceOffsetAmplitude", Range(0, 0.1)) = 0.002
+		_DefaultColor ("Default Color", Color) = (0.2, 0.2, 0.2, 1)
+		_DepthMaskMin ("Depth Mask Min", Range(-2, 2)) = 0
 	}
 	SubShader
 	{
@@ -26,12 +28,16 @@
             UNITY_INSTANCING_BUFFER_START(Props)
             UNITY_INSTANCING_BUFFER_END(Props)
 
+			sampler2D _CameraDepthTexture;
+
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
 			float _Cutoff;
 			float _HueInterval;
 			float _HueSteps;
 			float _InstanceOffsetAmplitude;
+			fixed4 _DefaultColor;
+			float _DepthMaskMin;
 
 			struct appdata
 			{
@@ -44,7 +50,8 @@
 			{
 				float4 vertex : SV_POSITION;
 				float4 world : TEXCOORD0;
-				float2 uv : TEXCOORD1;
+				float4 screen : TEXCOORD1;
+				float2 uv : TEXCOORD2;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 			
@@ -55,6 +62,7 @@
                 UNITY_TRANSFER_INSTANCE_ID(v, o);
 				o.vertex = UnityObjectToClipPos(v.vertex);
                 o.world = mul(unity_ObjectToWorld, v.vertex);
+				o.screen = ComputeScreenPos(o.vertex);
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 				return o;
 			}
@@ -74,9 +82,15 @@
 				if (c.a < _Cutoff) {
 					discard;
 				}
-				half h = (i.world.x + i.world.y + UNITY_GET_INSTANCE_ID(i) * _InstanceOffsetAmplitude) / (_HueInterval);
-				h = floor(h * _HueSteps) / _HueSteps;
-				return fixed4(Hue2RGB(h), 1);
+
+				half hue = (i.world.x + i.world.y + UNITY_GET_INSTANCE_ID(i) * _InstanceOffsetAmplitude) / (_HueInterval);
+				hue = floor(hue * _HueSteps) / _HueSteps;
+				fixed4 finalColor = fixed4(Hue2RGB(hue), 1);
+
+				float depth = Linear01Depth(tex2Dproj(_CameraDepthTexture, UNITY_PROJ_COORD(i.screen)).x);
+				finalColor = lerp(finalColor, _DefaultColor, step(1 - depth, _DepthMaskMin));
+
+				return finalColor;
 			}
 			ENDCG
 		}

@@ -28,10 +28,10 @@ public class SinFlowSystem : JobComponentSystem {
                 sinflow.Origin.x + math.sin(sinflow.Phase.x + Time * sinflow.Frequency.x) * sinflow.Amplitude.x,
                 sinflow.Origin.y + math.sin(sinflow.Phase.y + Time * sinflow.Frequency.y) * sinflow.Amplitude.y
             );
-            s.Value = new float2(
-                0.1f + math.sin(sinflow.Phase.x + Time * 1.5f) * 0.1f,
-                0.1f + math.sin(sinflow.Phase.y + Time * 2.7f) * 0.1f
-            );
+            //s.Value = new float2(
+            //    0.1f + math.sin(sinflow.Phase.x + Time * 1.5f) * 0.1f,
+            //    0.1f + math.sin(sinflow.Phase.y + Time * 2.7f) * 0.1f
+            //);
         }
     }
 
