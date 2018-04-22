@@ -54,7 +54,7 @@ public static class Main {
                     Seed = Random.value,
                     Origin = em.GetComponentData<Translate2D>(dot).Value,
                     Interval = 0.5f,
-                    MaxAmplitude = 0.8f,
+                    MaxAmplitude = 0.35f,
                     _Time = 2 + Random.value,
                 });
                 em.AddSharedComponentData(dot, DotDepthLitRenderer);

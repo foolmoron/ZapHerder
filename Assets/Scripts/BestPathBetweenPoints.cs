@@ -6,7 +6,9 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Rendering;
 using UnityEngine;
+using UnityEngine.Networking;
 using Random = UnityEngine.Random;
 
 public class BestPathBetweenPointsWorker : IDisposable {
@@ -48,7 +50,18 @@ public class BestPathBetweenPointsWorker : IDisposable {
         _BucketEntityCounts = new NativeArray<int>(bucketCount, Allocator.Persistent);
         _BucketEntities = new NativeArray<int>(bucketCount * MAX_ENTITIES_PER_BUCKET, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
         _BucketPath = new NativeArray<int2>(bucketCount, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-        _DirsToCheck = new NativeArray<int2>(3, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+
+        _DirsToCheck = new NativeArray<int2>(new[] {
+            new int2(1, 1),
+            new int2(1, 0),
+            new int2(1, -1),
+            new int2(0, -1),
+            new int2(-1, -1),
+            new int2(-1, 0),
+            new int2(-1, 1),
+            new int2(0, 1),
+        }, Allocator.Persistent);
+        
 
         path = new List<float2>(bucketCount);
 
@@ -111,7 +124,7 @@ public class BestPathBetweenPointsWorker : IDisposable {
         int pathIndex;
 
         float pathHeuristic(int bucketIndex, int2 dir, int2 optimalDir) {
-            var dirFactor = math.pow(math.max(0, math.csum(math.abs(optimalDir - dir)) - 1), 4);
+            var dirFactor = math.pow(math.max(0, math.csum(math.abs(optimalDir - dir)) - 1), 4) * 2;
             var entityFactor = BucketEntityCounts[bucketIndex];
             return entityFactor - dirFactor;
         }
@@ -137,15 +150,6 @@ public class BestPathBetweenPointsWorker : IDisposable {
 
                 var vectorToEnd = math.normalize(endBucket - currentBucket);
                 var signsToEnd = (int2) math.sign(vectorToEnd);
-                if (math.abs(vectorToEnd.y) > math.abs(vectorToEnd.x)) {
-                    DirsToCheck[0] = new int2(0, signsToEnd.y);
-                    DirsToCheck[1] = new int2(-1, signsToEnd.y);
-                    DirsToCheck[2] = new int2(1, signsToEnd.y);
-                } else {
-                    DirsToCheck[0] = new int2(signsToEnd.y, 0);
-                    DirsToCheck[1] = new int2(signsToEnd.y, -1);
-                    DirsToCheck[2] = new int2(signsToEnd.y, 1);
-                }
 
                 var bestHeuristic = 0f;
                 var bestBucket = currentBucket + signsToEnd;
@@ -263,19 +267,23 @@ public class BestPathBetweenPointsWorker : IDisposable {
         return path;
     }
 
-    public bool DoMarking(int pathIndex) {
+    public int DoMarking(int pathIndex) {
         pathIndex--; // due to start point
         if (pathIndex >= 0 && pathIndex < _BucketPath.Length && math.all(_BucketPath[pathIndex] != -1)) {
             var em = World.Active.GetExistingManager<EntityManager>();
             var bucketIndex = _BucketPath[pathIndex].x + _BucketPath[pathIndex].y * BucketCounts.x;
             var count = _BucketEntityCounts[bucketIndex];
+            var marked = 0;
             for (int i = 0; i < count; i++) {
                 var dot = Main.Dots[_BucketEntities[bucketIndex * MAX_ENTITIES_PER_BUCKET + i]];
-                em.SetSharedComponentData(dot, Main.DotAlwaysLitRenderer);
+                if (em.GetSharedComponentData<MeshInstanceRenderer>(dot).material != Main.DotAlwaysLitRenderer.material) {
+                    em.SetSharedComponentData(dot, Main.DotAlwaysLitRenderer);
+                    marked++;
+                }
             }
-            return true;
+            return marked;
         }
-        return false;
+        return 0;
     }
 
     StringBuilder s = new StringBuilder();
