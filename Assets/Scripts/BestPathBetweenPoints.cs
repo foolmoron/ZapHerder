@@ -7,6 +7,7 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class BestPathBetweenPointsWorker : IDisposable {
 
@@ -31,6 +32,8 @@ public class BestPathBetweenPointsWorker : IDisposable {
     NativeArray<int2> _BucketPath;
     NativeArray<int2> _DirsToCheck;
 
+    List<float2> path;
+
     public BestPathBetweenPointsWorker Init(int numPoints, float2 minPosition, float2 maxPosition, float2 bucketSize) {
         MinPosition = minPosition;
         BucketSize = bucketSize;
@@ -46,6 +49,8 @@ public class BestPathBetweenPointsWorker : IDisposable {
         _BucketEntities = new NativeArray<int>(bucketCount * MAX_ENTITIES_PER_BUCKET, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
         _BucketPath = new NativeArray<int2>(bucketCount, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
         _DirsToCheck = new NativeArray<int2>(3, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+
+        path = new List<float2>(bucketCount);
 
         return this;
     }
@@ -224,6 +229,20 @@ public class BestPathBetweenPointsWorker : IDisposable {
         }.Schedule(pointsToBucketsJob);
 
         return findBestPathJob;
+    }
+
+    public List<float2> GetFinishedPath(float2 start, float2 end) {
+        var em = World.Active.GetExistingManager<EntityManager>();
+        path.Clear();
+        path.Add(start);
+        for (int i = 0; i < _BucketPath.Length && math.all(_BucketPath[i] >= 0); i++) {
+            var bucketIndex = _BucketPath[i].x + _BucketPath[i].y * BucketCounts.x;
+            var pointIndex = Random.Range(0, _BucketEntityCounts[bucketIndex]);
+            var e = Main.Dots[_BucketEntities[bucketIndex * MAX_ENTITIES_PER_BUCKET + pointIndex]];
+            path.Add(em.GetComponentData<Translate2D>(e).Value);
+        }
+        path.Add(end);
+        return path;
     }
 
     StringBuilder s = new StringBuilder();

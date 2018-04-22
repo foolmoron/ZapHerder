@@ -155,6 +155,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9f26fd21f321594683a551cba35016c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PathBucketSize: 0.3
+  LinePrefab: {fileID: 1229224417700476, guid: 70659a80ea222d74197bb2dcb98adf6a, type: 2}
 --- !u!198 &198354055045223178
 ParticleSystem:
   m_ObjectHideFlags: 1

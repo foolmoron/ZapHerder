@@ -11,6 +11,9 @@ public class Orb : MonoBehaviour {
     [Range(0.1f, 2f)]
     public float PathBucketSize = 0.3f;
 
+    public GameObject LinePrefab;
+    LineRenderer line;
+
     Camera camera;
     BestPathBetweenPointsWorker pathWorker;
 
@@ -18,6 +21,8 @@ public class Orb : MonoBehaviour {
 
     void Awake() {
         camera = FindObjectOfType<Camera>();
+
+        line = Instantiate(LinePrefab).GetComponent<LineRenderer>();
     }
 
     void Start() {
@@ -32,12 +37,17 @@ public class Orb : MonoBehaviour {
     float x;
     int z = 500;
     void LateUpdate() {
+        pathJob.Complete();
+
+        var path = pathWorker.GetFinishedPath(transform.position.to2(), camera.ScreenToWorldPoint(Input.mousePosition).to2());
+        line.positionCount = path.Count;
+        line.SetPositions(path.Map(p => new Vector3(p.x, p.y)));
+
         x -= Time.deltaTime;
         if (x <= 0) {
             x = 0.01f;
             z++;
         }
-        pathJob.Complete();
         pathWorker.D(z);
     }
 
