@@ -19,4 +19,8 @@ public static class Extensions {
     public static float random(this float val1, float val2) {
         return math.frac(math.sin(val1 * 12.9898f + val2 * 78.233f) * 43758.5453123f);
     }
+
+    public static Vector3 to3(this float2 vector, float z = 0) {
+        return new Vector3(vector.x, vector.y, z);
+    }
 }

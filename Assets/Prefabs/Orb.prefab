@@ -156,6 +156,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PathBucketSize: 0.3
+  BaseMoveDuration: 0.3
+  MedianPath: 34
+  Moving: 0
   LinePrefab: {fileID: 1229224417700476, guid: 70659a80ea222d74197bb2dcb98adf6a, type: 2}
 --- !u!198 &198354055045223178
 ParticleSystem:

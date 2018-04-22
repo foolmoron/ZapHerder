@@ -11,17 +11,25 @@ public class Orb : MonoBehaviour {
     [Range(0.1f, 2f)]
     public float PathBucketSize = 0.3f;
 
+    [Range(0, 1f)]
+    public float BaseMoveDuration = 0.5f;
+    [Range(0, 100)]
+    public int MedianPath = 30;
+    public bool Moving;
+
     public GameObject LinePrefab;
     LineRenderer line;
 
     Camera camera;
     BestPathBetweenPointsWorker pathWorker;
+    List<float2> latestPath = new List<float2>();
+    float pathDistance;
+    float pathSpeed;
 
-    JobHandle pathJob;
+    JobHandle? pathJob;
 
     void Awake() {
         camera = FindObjectOfType<Camera>();
-
         line = Instantiate(LinePrefab).GetComponent<LineRenderer>();
     }
 
@@ -31,21 +39,51 @@ public class Orb : MonoBehaviour {
 
     void Update() {
         var em = World.Active.GetExistingManager<EntityManager>();
-        pathJob = pathWorker.DoJob(transform.position.to2(), camera.ScreenToWorldPoint(Input.mousePosition).to2(), Main.Dots);
+        // move on click
+        if (Input.GetMouseButtonDown(0)) {
+            Moving = true;
+        }
+        // do move
+        if (Moving) {
+            pathJob = null;
+            pathDistance += pathSpeed * Time.deltaTime;
+            var pathIndex = Mathf.Min(latestPath.Count, Mathf.FloorToInt(pathDistance));
+            if (pathIndex >= latestPath.Count) {
+                Moving = false;
+            } else {
+                transform.position = latestPath[pathIndex].to3();
+            }
+        }
+        // do pathing
+        else {
+            pathJob = pathWorker.DoJob(transform.position.to2(), camera.ScreenToWorldPoint(Input.mousePosition).to2(), Main.Dots);
+        }
+        line.gameObject.SetActive(!Moving);
     }
     
     float x;
     int z = 500;
     void LateUpdate() {
-        pathJob.Complete();
+        if (pathJob != null) {
+            pathJob.Value.Complete();
 
-        var path = pathWorker.GetFinishedPath(transform.position.to2(), camera.ScreenToWorldPoint(Input.mousePosition).to2());
-        line.positionCount = path.Count;
-        line.SetPositions(path.Map(p => new Vector3(p.x, p.y)));
+            latestPath = pathWorker.GetFinishedPath(transform.position.to2(), camera.ScreenToWorldPoint(Input.mousePosition).to2());
+            pathDistance = 0;
+            var pathLengthModifier = Mathf.Pow((float)MedianPath / latestPath.Count, 0.5f);
+            pathSpeed = latestPath.Count * pathLengthModifier / BaseMoveDuration;
+        }
+
+        var pathIndex = Mathf.Min(latestPath.Count, Mathf.FloorToInt(pathDistance));
+        line.positionCount = latestPath.Count - pathIndex;
+        var points = new Vector3[line.positionCount];
+        for (int p = 0; p < points.Length; p++) {
+            points[p] = latestPath[p + pathIndex].to3();
+        }
+        line.SetPositions(points);
 
         x -= Time.deltaTime;
         if (x <= 0) {
-            x = 0.01f;
+            x = 0.01f; 
             z++;
         }
         //pathWorker.D(z);
