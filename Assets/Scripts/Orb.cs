@@ -8,6 +8,9 @@ using UnityEngine;
 
 public class Orb : MonoBehaviour {
 
+    [Range(0.1f, 2f)]
+    public float PathBucketSize = 0.3f;
+
     Camera camera;
     BestPathBetweenPointsWorker pathWorker;
 
@@ -18,7 +21,7 @@ public class Orb : MonoBehaviour {
     }
 
     void Start() {
-        pathWorker = new BestPathBetweenPointsWorker().Init(Main.Dots.Length, new float2(-19.20f / 2 - 1, -10.80f / 2 - 1), new float2(19.20f / 2 + 1, 10.80f / 2 + 1), new float2(1f, 1f));
+        pathWorker = new BestPathBetweenPointsWorker().Init(Main.Dots.Length, new float2(-19.20f / 2 - 1, -10.80f / 2 - 1), new float2(19.20f / 2 + 1, 10.80f / 2 + 1), new float2(PathBucketSize, PathBucketSize));
     }
 
     void Update() {
@@ -27,14 +30,18 @@ public class Orb : MonoBehaviour {
     }
     
     float x;
-    public int z;
+    int z = 500;
     void LateUpdate() {
         x -= Time.deltaTime;
         if (x <= 0) {
-            x = 0.05f;
+            x = 0.01f;
             z++;
         }
         pathJob.Complete();
         pathWorker.D(z);
+    }
+
+    void OnDestroy() {
+        pathWorker.Dispose();
     }
 }
