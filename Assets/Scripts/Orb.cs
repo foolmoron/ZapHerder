@@ -28,6 +28,7 @@ public class Orb : MonoBehaviour {
     Camera camera;
     BestPathBetweenPointsWorker pathWorker;
     List<float2> latestPath = new List<float2>();
+    int prevPathIndex = -1;
     float pathDistance;
     float pathSpeed;
 
@@ -56,13 +57,20 @@ public class Orb : MonoBehaviour {
             var pathIndex = Mathf.Min(latestPath.Count, Mathf.FloorToInt(pathDistance));
             if (pathIndex >= latestPath.Count) {
                 Moving = false;
-            } else {
+            } else if (pathIndex != prevPathIndex) {
+                // move
                 transform.position = latestPath[pathIndex].to3();
+                // mark dots
+                for (int p = prevPathIndex; p <= pathIndex; p++) {
+                    pathWorker.DoMarking(p);
+                }
             }
+            prevPathIndex = pathIndex;
         }
         // do pathing
         else {
-            pathJob = pathWorker.DoJob(transform.position.to2(), camera.ScreenToWorldPoint(Input.mousePosition).to2(), Main.Dots);
+            pathJob = pathWorker.DoPathing(transform.position.to2(), camera.ScreenToWorldPoint(Input.mousePosition).to2(), Main.Dots);
+            prevPathIndex = -1;
         }
         // line width
         lineWidth.BaseWidth = Moving ? LineMovingWidth : LineAimingWidth;
@@ -71,6 +79,7 @@ public class Orb : MonoBehaviour {
     float x;
     int z = 500;
     void LateUpdate() {
+        // pathing
         if (pathJob != null) {
             pathJob.Value.Complete();
 
@@ -79,7 +88,7 @@ public class Orb : MonoBehaviour {
             var pathLengthModifier = Mathf.Pow((float)MedianPath / latestPath.Count, 0.5f);
             pathSpeed = latestPath.Count * pathLengthModifier / BaseMoveDuration;
         }
-
+        // line stuff
         var pathIndex = Mathf.Min(latestPath.Count, Mathf.FloorToInt(pathDistance));
         line.positionCount = latestPath.Count - pathIndex;
         var points = new Vector3[line.positionCount];

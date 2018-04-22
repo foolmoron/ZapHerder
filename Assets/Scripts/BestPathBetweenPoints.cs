@@ -187,7 +187,7 @@ public class BestPathBetweenPointsWorker : IDisposable {
         }
     }
 
-    public JobHandle DoJob(float2 start, float2 end, Entity[] entities) {
+    public JobHandle DoPathing(float2 start, float2 end, Entity[] entities) {
         var em = World.Active.GetExistingManager<EntityManager>();
         
         // setup arrays
@@ -261,6 +261,21 @@ public class BestPathBetweenPointsWorker : IDisposable {
         }
         path.Add(end);
         return path;
+    }
+
+    public bool DoMarking(int pathIndex) {
+        pathIndex--; // due to start point
+        if (pathIndex >= 0 && pathIndex < _BucketPath.Length && math.all(_BucketPath[pathIndex] != -1)) {
+            var em = World.Active.GetExistingManager<EntityManager>();
+            var bucketIndex = _BucketPath[pathIndex].x + _BucketPath[pathIndex].y * BucketCounts.x;
+            var count = _BucketEntityCounts[bucketIndex];
+            for (int i = 0; i < count; i++) {
+                var dot = Main.Dots[_BucketEntities[bucketIndex * MAX_ENTITIES_PER_BUCKET + i]];
+                em.SetSharedComponentData(dot, Main.DotAlwaysLitRenderer);
+            }
+            return true;
+        }
+        return false;
     }
 
     StringBuilder s = new StringBuilder();
