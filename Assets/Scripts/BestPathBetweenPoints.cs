@@ -35,6 +35,7 @@ public class BestPathBetweenPointsWorker : IDisposable {
     NativeArray<int2> _DirsToCheck;
 
     List<float2> path;
+    List<Entity> pathDots;
 
     public BestPathBetweenPointsWorker Init(int numPoints, float2 minPosition, float2 maxPosition, float2 bucketSize) {
         MinPosition = minPosition;
@@ -64,6 +65,7 @@ public class BestPathBetweenPointsWorker : IDisposable {
         
 
         path = new List<float2>(bucketCount);
+        pathDots = new List<Entity>(bucketCount);
 
         return this;
     }
@@ -245,6 +247,7 @@ public class BestPathBetweenPointsWorker : IDisposable {
     public List<float2> GetFinishedPath(float2 start, float2 end) {
         var em = World.Active.GetExistingManager<EntityManager>();
         path.Clear();
+        pathDots.Clear();
         path.Add(start);
         for (int i = 0; i < _BucketPath.Length; i++) {
             if (math.any(_BucketPath[i] < 0)) {
@@ -262,11 +265,12 @@ public class BestPathBetweenPointsWorker : IDisposable {
                 break;
             }
             path.Add(newPath);
+            pathDots.Add(e);
         }
         path.Add(end);
         return path;
     }
-
+    
     public int DoMarking(int pathIndex) {
         pathIndex--; // due to start point
         if (pathIndex >= 0 && pathIndex < _BucketPath.Length && math.all(_BucketPath[pathIndex] != -1)) {
@@ -284,6 +288,16 @@ public class BestPathBetweenPointsWorker : IDisposable {
             return marked;
         }
         return 0;
+    }
+
+    public bool DidTouchMarked(int pathIndex) {
+        pathIndex--; // due to start point
+        if (pathIndex >= 0 && pathIndex < pathDots.Count) {
+            var em = World.Active.GetExistingManager<EntityManager>();
+            var dot = pathDots[pathIndex];
+            return em.GetSharedComponentData<MeshInstanceRenderer>(dot).material == Main.DotAlwaysLitRenderer.material;
+        }
+        return false;
     }
 
     StringBuilder s = new StringBuilder();

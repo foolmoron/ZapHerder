@@ -10,6 +10,11 @@ public class Orb : MonoBehaviour {
 
     [Range(0.1f, 2f)]
     public float PathBucketSize = 0.3f;
+    [Range(0, 5)]
+    public int HitsToDie = 3;
+    int hits;
+    [Range(0, 20)]
+    public int StartHitLeniency = 5;
 
     [Range(0, 1f)]
     public float BaseMoveDuration = 0.5f;
@@ -25,19 +30,25 @@ public class Orb : MonoBehaviour {
     [Range(0, 0.5f)]
     public float LineMovingWidth;
 
+    public GameObject DeathCirclePrefab;
+    public float DeathCircleZ = 10;
+
     Camera camera;
     BestPathBetweenPointsWorker pathWorker;
     List<float2> latestPath = new List<float2>();
-    int prevPathIndex = -1;
+    int prevPathIndex;
     float pathDistance;
     float pathSpeed;
 
     JobHandle? pathJob;
 
+    float z;
+
     void Awake() {
         camera = FindObjectOfType<Camera>();
         line = Instantiate(LinePrefab).GetComponent<LineRenderer>();
         lineWidth = line.GetComponent<LineWidthShaker>();
+        z = transform.position.z;
     }
 
     void Start() {
@@ -58,11 +69,26 @@ public class Orb : MonoBehaviour {
             if (pathIndex >= latestPath.Count) {
                 Moving = false;
             } else if (pathIndex != prevPathIndex) {
-                // move
-                transform.position = latestPath[pathIndex].to3();
-                // mark dots
-                for (int p = prevPathIndex; p <= pathIndex; p++) {
-                    pathWorker.DoMarking(p);
+                for (int p = prevPathIndex + 1; p <= pathIndex; p++) {
+                    // move
+                    transform.position = latestPath[pathIndex].to3(z);
+                    // death (immune for first few path points)
+                    if (p > StartHitLeniency && pathWorker.DidTouchMarked(p)) {
+                        hits++;
+                    }
+                    if (hits >= HitsToDie) { 
+                        var deathCircle = Instantiate(DeathCirclePrefab, transform.position.withZ(DeathCircleZ), Quaternion.identity);
+                        // disable stuff
+                        enabled = false;
+                        foreach (var dot in Main.Dots) {
+                            em.AddComponentData(dot, new RandomFlowReset { Decay = 0.35f, IntervalDecay = 0.9f, });
+                        }
+                        line.gameObject.SetActive(false);
+                        break;
+                    } else {
+                        // mark dots
+                        var marked = pathWorker.DoMarking(p);
+                    }
                 }
             }
             prevPathIndex = pathIndex;
@@ -70,14 +96,13 @@ public class Orb : MonoBehaviour {
         // do pathing
         else {
             pathJob = pathWorker.DoPathing(transform.position.to2(), camera.ScreenToWorldPoint(Input.mousePosition).to2(), Main.Dots);
-            prevPathIndex = -1;
+            prevPathIndex = 0;
+            hits = 0;
         }
         // line width
         lineWidth.BaseWidth = Moving ? LineMovingWidth : LineAimingWidth;
     }
     
-    float x;
-    int z = 500;
     void LateUpdate() {
         // pathing
         if (pathJob != null) {
@@ -96,13 +121,6 @@ public class Orb : MonoBehaviour {
             points[p] = latestPath[p + pathIndex].to3();
         }
         line.SetPositions(points);
-
-        x -= Time.deltaTime;
-        if (x <= 0) {
-            x = 0.01f; 
-            z++;
-        }
-        //pathWorker.D(z);
     }
 
     void OnDestroy() {

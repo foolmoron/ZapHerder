@@ -162,6 +162,9 @@ MonoBehaviour:
   LinePrefab: {fileID: 1229224417700476, guid: 70659a80ea222d74197bb2dcb98adf6a, type: 2}
   LineAimingWidth: 0.163
   LineMovingWidth: 0.046
+  DeathCirclePrefab: {fileID: 1357545523346818, guid: 2a8806f4009a883498296c4dcf31c0db,
+    type: 2}
+  DeathCircleZ: 10
 --- !u!198 &198354055045223178
 ParticleSystem:
   m_ObjectHideFlags: 1
