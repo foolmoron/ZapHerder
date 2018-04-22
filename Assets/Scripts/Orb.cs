@@ -48,7 +48,7 @@ public class Orb : MonoBehaviour {
             x = 0.01f;
             z++;
         }
-        pathWorker.D(z);
+        //pathWorker.D(z);
     }
 
     void OnDestroy() {

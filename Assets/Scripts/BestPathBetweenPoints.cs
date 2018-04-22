@@ -11,7 +11,7 @@ using Random = UnityEngine.Random;
 
 public class BestPathBetweenPointsWorker : IDisposable {
 
-    public const int MAX_ENTITIES_PER_BUCKET = 5120;
+    public const int MAX_ENTITIES_PER_BUCKET = 32;
 
     struct Bucket {
         public NativeArray<int> Entities;
@@ -110,18 +110,25 @@ public class BestPathBetweenPointsWorker : IDisposable {
         public NativeArray<int2> DirsToCheck;
         int pathIndex;
 
-        float pathHeuristic(int bucketIndex, int2 bucket, int2 endBucket) {
-            return BucketEntityCounts[bucketIndex] - math.distance(bucket, endBucket);
+        float pathHeuristic(int bucketIndex, int2 dir, int2 optimalDir) {
+            var dirFactor = math.pow(math.max(0, math.csum(math.abs(optimalDir - dir)) - 1), 4);
+            var entityFactor = BucketEntityCounts[bucketIndex];
+            return entityFactor - dirFactor;
         }
 
         public void Execute() {
             var startBucket = new int2(Mathf.FloorToInt((Start.x - Min.x) / BucketSize.x), Mathf.FloorToInt((Start.y - Min.y) / BucketSize.y));
-            startBucket = math.min(startBucket, BucketCounts - new int2(1, 1));
+            startBucket = math.clamp(startBucket, new int2(0, 0), BucketCounts - new int2(1, 1));
             var endBucket = new int2(Mathf.FloorToInt((End.x - Min.x) / BucketSize.x), Mathf.FloorToInt((End.y - Min.y) / BucketSize.y));
-            endBucket = math.min(endBucket, BucketCounts - new int2(1, 1));
+            endBucket = math.clamp(endBucket, new int2(0, 0), BucketCounts - new int2(1, 1));
             
             var currentBucket = startBucket;
-            while (math.any(currentBucket != endBucket)) {
+            while (math.any(currentBucket != endBucket)) { // go until we reach the end
+                // or if the best path is out of bounds because the mouse is out of bounds
+                if (math.any(currentBucket < 0) || math.any(currentBucket >= BucketCounts)) {
+                    break;
+                }
+
                 BucketPath[pathIndex] = currentBucket;
                 pathIndex++;
 
@@ -168,7 +175,7 @@ public class BestPathBetweenPointsWorker : IDisposable {
                     if (!valid) {
                         continue;
                     }
-                    var h = pathHeuristic(newBucketIndex, newBucket, endBucket);
+                    var h = pathHeuristic(newBucketIndex, dir, signsToEnd);
                     if (h > bestHeuristic) {
                         bestHeuristic = h;
                         bestBucket = newBucket;
@@ -235,11 +242,22 @@ public class BestPathBetweenPointsWorker : IDisposable {
         var em = World.Active.GetExistingManager<EntityManager>();
         path.Clear();
         path.Add(start);
-        for (int i = 0; i < _BucketPath.Length && math.all(_BucketPath[i] >= 0); i++) {
+        for (int i = 0; i < _BucketPath.Length; i++) {
+            if (math.any(_BucketPath[i] < 0)) {
+                break;
+            }
             var bucketIndex = _BucketPath[i].x + _BucketPath[i].y * BucketCounts.x;
             var pointIndex = Random.Range(0, _BucketEntityCounts[bucketIndex]);
-            var e = Main.Dots[_BucketEntities[bucketIndex * MAX_ENTITIES_PER_BUCKET + pointIndex]];
-            path.Add(em.GetComponentData<Translate2D>(e).Value);
+            var dotIndex = _BucketEntities[bucketIndex * MAX_ENTITIES_PER_BUCKET + pointIndex];
+            if (dotIndex < 0 || dotIndex >= Main.Dots.Length) {
+                break;
+            }
+            var e = Main.Dots[dotIndex];
+            var newPath = em.GetComponentData<Translate2D>(e).Value;
+            if (i > 1 && math.csum(math.abs(newPath - path[i])) > 3f) {
+                break;
+            }
+            path.Add(newPath);
         }
         path.Add(end);
         return path;
