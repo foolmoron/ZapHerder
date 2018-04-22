@@ -156,6 +156,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PathBucketSize: 0.3
+  HitsToDie: 2
+  StartHitLeniency: 1
   BaseMoveDuration: 0.3
   MedianPath: 34
   Moving: 0
@@ -165,6 +167,10 @@ MonoBehaviour:
   DeathCirclePrefab: {fileID: 1357545523346818, guid: 2a8806f4009a883498296c4dcf31c0db,
     type: 2}
   DeathCircleZ: 10
+  TimeToClickFast: 0.7
+  TimeToClickLudicrous: 0.2
+  LongDistanceLength: 30
+  SharpshooterLength: 60
 --- !u!198 &198354055045223178
 ParticleSystem:
   m_ObjectHideFlags: 1

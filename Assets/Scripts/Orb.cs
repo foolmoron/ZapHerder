@@ -11,10 +11,10 @@ public class Orb : MonoBehaviour {
     [Range(0.1f, 2f)]
     public float PathBucketSize = 0.3f;
     [Range(0, 5)]
-    public int HitsToDie = 3;
+    public int HitsToDie = 2;
     int hits;
-    [Range(0, 20)]
-    public int StartHitLeniency = 5;
+    [Range(0, 2)]
+    public float StartHitLeniency = 0.5f;
 
     [Range(0, 1f)]
     public float BaseMoveDuration = 0.5f;
@@ -42,6 +42,15 @@ public class Orb : MonoBehaviour {
 
     JobHandle? pathJob;
 
+    int totalMarked;
+
+    public float TimeToClickFast = 0.7f;
+    public float TimeToClickLudicrous = 0.3f;
+    float lastTimeReadyToClick;
+
+    public float LongDistanceLength = 40;
+    public float SharpshooterLength = 70;
+
     float z;
 
     void Awake() {
@@ -60,6 +69,14 @@ public class Orb : MonoBehaviour {
         // move on click
         if (Input.GetMouseButtonDown(0)) {
             Moving = true;
+            Bonus.Inst.Commit();
+            var timeToClick = Time.realtimeSinceStartup - lastTimeReadyToClick;
+            if (timeToClick < TimeToClickLudicrous) {
+                Bonus.Inst.AddBonus(new BonusRecord { Name = "GOTTA GO FAST", Amount = 4 });
+            } else if (timeToClick < TimeToClickFast) {
+                Bonus.Inst.AddBonus(new BonusRecord { Name = "FAST CLICK", Amount = 2 });
+            }
+            Debug.Log("T " + timeToClick);
         }
         // do move
         if (Moving) {
@@ -68,13 +85,23 @@ public class Orb : MonoBehaviour {
             var pathIndex = Mathf.Min(latestPath.Count, Mathf.FloorToInt(pathDistance));
             if (pathIndex >= latestPath.Count) {
                 Moving = false;
+                Bonus.Inst.CommitDelayed(0.7f);
+                lastTimeReadyToClick = Time.realtimeSinceStartup;
+                if (latestPath.Count >= LongDistanceLength) {
+                    Bonus.Inst.AddBonus(new BonusRecord { Name = "LONG DISTANCE", Amount = 2 });
+                } else if (latestPath.Count >= SharpshooterLength) {
+                    Bonus.Inst.AddBonus(new BonusRecord { Name = "SHARPSHOOTER", Amount = 5 });
+                }
+                Debug.Log("L " + latestPath.Count);
             } else if (pathIndex != prevPathIndex) {
                 for (int p = prevPathIndex + 1; p <= pathIndex; p++) {
                     // move
                     transform.position = latestPath[pathIndex].to3(z);
-                    // death (immune for first few path points)
-                    if (p > StartHitLeniency && pathWorker.DidTouchMarked(p)) {
+                    // death (immune for near points)
+                    var distFromBeginning = math.length(latestPath[pathIndex] - latestPath[0]);
+                    if (distFromBeginning > StartHitLeniency && pathWorker.DidTouchMarked(p)) {
                         hits++;
+                        Bonus.Inst.AddBonus(new BonusRecord { Name = "RISKY", Amount = 3 });
                     }
                     if (hits >= HitsToDie) { 
                         var deathCircle = Instantiate(DeathCirclePrefab, transform.position.withZ(DeathCircleZ), Quaternion.identity);
@@ -84,10 +111,13 @@ public class Orb : MonoBehaviour {
                             em.AddComponentData(dot, new RandomFlowReset { Decay = 0.35f, IntervalDecay = 0.9f, });
                         }
                         line.gameObject.SetActive(false);
+                        Bonus.Inst.CommitDelayed(0.7f);
                         break;
                     } else {
                         // mark dots
                         var marked = pathWorker.DoMarking(p);
+                        totalMarked += marked;
+                        Bonus.Inst.Zaps = totalMarked;
                     }
                 }
             }
@@ -98,6 +128,7 @@ public class Orb : MonoBehaviour {
             pathJob = pathWorker.DoPathing(transform.position.to2(), camera.ScreenToWorldPoint(Input.mousePosition).to2(), Main.Dots);
             prevPathIndex = 0;
             hits = 0;
+            totalMarked = 0;
         }
         // line width
         lineWidth.BaseWidth = Moving ? LineMovingWidth : LineAimingWidth;

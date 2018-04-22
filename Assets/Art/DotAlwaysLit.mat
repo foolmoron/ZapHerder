@@ -58,6 +58,7 @@ Material:
     - _BumpScale: 1
     - _Cutoff: 0.86
     - _DepthMaskMin: -2
+    - _DepthOffset: -0.01
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _GlossMapScale: 1

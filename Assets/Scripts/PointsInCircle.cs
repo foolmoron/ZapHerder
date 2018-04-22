@@ -52,9 +52,10 @@ public class PointsInCircle : IDisposable {
     }
 
     public int CountUnmarked(float radius) {
+        var em = World.Active.GetExistingManager<EntityManager>();
         var count = 0;
         for (int i = 0; i < _PointDistances.Length; i++) {
-            if (_PointDistances[i] <= radius) {
+            if (_PointDistances[i] <= radius && em.GetSharedComponentData<MeshInstanceRenderer>(Main.Dots[i]).material != Main.DotAlwaysLitRenderer.material) {
                 count++;
             }
         }
