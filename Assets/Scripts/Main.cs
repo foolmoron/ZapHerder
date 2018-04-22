@@ -13,6 +13,8 @@ public static class Main {
     public static MeshInstanceRenderer DotDepthLitRenderer;
     public static MeshInstanceRenderer DotAlwaysLitRenderer;
 
+    public static Entity[] Dots { get; private set; }
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void BeforeSceneLoad() {
         var em = World.Active.GetOrCreateManager<EntityManager>();
@@ -27,9 +29,13 @@ public static class Main {
         DotDepthLitRenderer = GameObject.Find("Prototypes/DotDepthLit").GetComponent<MeshInstanceRendererComponent>().Value;
         DotAlwaysLitRenderer = GameObject.Find("Prototypes/DotAlwaysLit").GetComponent<MeshInstanceRendererComponent>().Value;
 
+        const int X = 192;
+        const int Y = 108;
+        Dots = new Entity[X * Y];
         for (int x = 0; x < 192; x++) {
             for (int y = 0; y < 108; y++) {
                 var dot = em.CreateEntity(DotArchetype);
+
                 em.SetComponentData(dot, new Translate2D { Value = new float2(-19.20f / 2 + x * 0.1f, -10.80f / 2 + y * 0.1f) });
                 em.SetComponentData(dot, new Scale2D { Value = new float2(0.06f) });
                 //em.AddComponentData(dot, new SinFlow {
@@ -52,6 +58,8 @@ public static class Main {
                     _Time = 2 + Random.value,
                 });
                 em.AddSharedComponentData(dot, DotDepthLitRenderer);
+
+                Dots[x + y * X] = dot;
             }
         }
     }

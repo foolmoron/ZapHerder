@@ -1,7 +1,7 @@
 ﻿Shader "Depth Mask" {
  
 	SubShader {
-		Tags {"Queue" = "Geometry+10" "LightMode" = "ShadowCaster" }
+		Tags {"Queue" = "Geometry+50" "LightMode" = "ShadowCaster" }
  
 		ZWrite On
 

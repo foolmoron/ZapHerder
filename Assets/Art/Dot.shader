@@ -12,7 +12,7 @@
 	}
 	SubShader
 	{
-		Tags { "RenderType"="Opaque" }
+		Tags { "Queue" = "Geometry+40" "RenderType"="Opaque" }
 		LOD 100
 
 		Pass
