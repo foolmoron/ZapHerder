@@ -19,6 +19,11 @@ public class Orb : MonoBehaviour {
 
     public GameObject LinePrefab;
     LineRenderer line;
+    LineWidthShaker lineWidth;
+    [Range(0, 0.5f)]
+    public float LineAimingWidth;
+    [Range(0, 0.5f)]
+    public float LineMovingWidth;
 
     Camera camera;
     BestPathBetweenPointsWorker pathWorker;
@@ -31,6 +36,7 @@ public class Orb : MonoBehaviour {
     void Awake() {
         camera = FindObjectOfType<Camera>();
         line = Instantiate(LinePrefab).GetComponent<LineRenderer>();
+        lineWidth = line.GetComponent<LineWidthShaker>();
     }
 
     void Start() {
@@ -58,7 +64,8 @@ public class Orb : MonoBehaviour {
         else {
             pathJob = pathWorker.DoJob(transform.position.to2(), camera.ScreenToWorldPoint(Input.mousePosition).to2(), Main.Dots);
         }
-        line.gameObject.SetActive(!Moving);
+        // line width
+        lineWidth.BaseWidth = Moving ? LineMovingWidth : LineAimingWidth;
     }
     
     float x;

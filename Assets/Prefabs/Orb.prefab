@@ -160,6 +160,8 @@ MonoBehaviour:
   MedianPath: 34
   Moving: 0
   LinePrefab: {fileID: 1229224417700476, guid: 70659a80ea222d74197bb2dcb98adf6a, type: 2}
+  LineAimingWidth: 0.163
+  LineMovingWidth: 0.046
 --- !u!198 &198354055045223178
 ParticleSystem:
   m_ObjectHideFlags: 1
