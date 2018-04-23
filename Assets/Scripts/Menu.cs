@@ -50,6 +50,11 @@ public class Menu : Manager<Menu> {
         Score.Inst.DesiredScore = 0;
         Score.Inst.RealScore = 0;
         Bonus.Inst.Clear();
+
+        var deaths = FindObjectsOfType<DeathCircle>();
+        foreach (var death in deaths) {
+            Destroy(death.gameObject);
+        }
     }
 
     public void EndGame() {
@@ -63,7 +68,7 @@ public class Menu : Manager<Menu> {
 
         var deaths = FindObjectsOfType<DeathCircle>();
         foreach (var death in deaths) {
-            Destroy(death.gameObject);
+            death.enabled = false;
         }
     }
 

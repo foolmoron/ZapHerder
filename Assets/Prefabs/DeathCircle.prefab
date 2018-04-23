@@ -123,7 +123,7 @@ MonoBehaviour:
   FlashInterval: 0.01
   FlashMaxTime: 0.2
   WowDeath: 300
-  GloriousDeath: 600
+  GloriousDeath: 520
 --- !u!135 &135660673835443218
 SphereCollider:
   m_ObjectHideFlags: 1
