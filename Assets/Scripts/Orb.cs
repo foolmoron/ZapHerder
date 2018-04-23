@@ -23,7 +23,7 @@ public class Orb : MonoBehaviour {
     public bool Moving;
 
     public GameObject LinePrefab;
-    LineRenderer line;
+    public LineRenderer line;
     LineWidthShaker lineWidth;
     [Range(0, 0.5f)]
     public float LineAimingWidth;
@@ -41,6 +41,8 @@ public class Orb : MonoBehaviour {
     float pathSpeed;
 
     JobHandle? pathJob;
+
+    GameObject moveSound;
 
     int totalMarked;
 
@@ -69,14 +71,16 @@ public class Orb : MonoBehaviour {
         // move on click
         if (Input.GetMouseButtonDown(0)) {
             Moving = true;
+            moveSound = Sounder.Inst.MoveSound.Play();
             Bonus.Inst.Commit();
             var timeToClick = Time.realtimeSinceStartup - lastTimeReadyToClick;
             if (timeToClick < TimeToClickLudicrous) {
                 Bonus.Inst.AddBonus(new BonusRecord { Name = "GOTTA GO FAST", Amount = 4 });
+                Sounder.Inst.LudicrousSound.Play();
             } else if (timeToClick < TimeToClickFast) {
-                Bonus.Inst.AddBonus(new BonusRecord { Name = "FAST CLICK", Amount = 2 });
+                Bonus.Inst.AddBonus(new BonusRecord { Name = "QUICK CLICK", Amount = 2 });
+                Sounder.Inst.QuickSound.Play();
             }
-            Debug.Log("T " + timeToClick);
         }
         // do move
         if (Moving) {
@@ -85,14 +89,16 @@ public class Orb : MonoBehaviour {
             var pathIndex = Mathf.Min(latestPath.Count, Mathf.FloorToInt(pathDistance));
             if (pathIndex >= latestPath.Count) {
                 Moving = false;
+                Destroy(moveSound);
                 Bonus.Inst.CommitDelayed(0.7f);
                 lastTimeReadyToClick = Time.realtimeSinceStartup;
-                if (latestPath.Count >= LongDistanceLength) {
-                    Bonus.Inst.AddBonus(new BonusRecord { Name = "LONG DISTANCE", Amount = 2 });
-                } else if (latestPath.Count >= SharpshooterLength) {
+                if (latestPath.Count >= SharpshooterLength) {
                     Bonus.Inst.AddBonus(new BonusRecord { Name = "SHARPSHOOTER", Amount = 5 });
+                    Sounder.Inst.SharpshooterSound.Play();
+                } else if (latestPath.Count >= LongDistanceLength) {
+                    Bonus.Inst.AddBonus(new BonusRecord { Name = "LONG DISTANCE", Amount = 2 });
+                    Sounder.Inst.LongSound.Play();
                 }
-                Debug.Log("L " + latestPath.Count);
             } else if (pathIndex != prevPathIndex) {
                 for (int p = prevPathIndex + 1; p <= pathIndex; p++) {
                     // move
@@ -102,6 +108,7 @@ public class Orb : MonoBehaviour {
                     if (distFromBeginning > StartHitLeniency && pathWorker.DidTouchMarked(p)) {
                         hits++;
                         Bonus.Inst.AddBonus(new BonusRecord { Name = "RISKY", Amount = 3 });
+                        Sounder.Inst.RiskySound.Play();
                     }
                     if (hits >= HitsToDie) { 
                         var deathCircle = Instantiate(DeathCirclePrefab, transform.position.withZ(DeathCircleZ), Quaternion.identity);
@@ -112,6 +119,8 @@ public class Orb : MonoBehaviour {
                         }
                         line.gameObject.SetActive(false);
                         Bonus.Inst.CommitDelayed(0.7f);
+                        Moving = false;
+                        Destroy(moveSound);
                         break;
                     } else {
                         // mark dots

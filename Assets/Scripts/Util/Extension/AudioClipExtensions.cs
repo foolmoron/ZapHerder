@@ -3,8 +3,8 @@ using System.Collections;
 
 public static class AudioClipExtensions {
 
-    public static void Play(this AudioClip audioClip, Vector3? pos = null, float volume = 1.0f, float pitch = 1.0f, float pan = 0.0f) {
-        if (!audioClip) return;
+    public static GameObject Play(this AudioClip audioClip, Vector3? pos = null, float volume = 1.0f, float pitch = 1.0f, float pan = 0.0f) {
+        if (!audioClip) return null;
 
         var position = pos ?? Vector3.zero;
         float originalTimeScale = Time.timeScale;
@@ -22,11 +22,13 @@ public static class AudioClipExtensions {
         Object.Destroy(go, audioClip.length);
 
         Time.timeScale = originalTimeScale;
+
+        return go;
     }
 
-    public static void Play(this AudioClip[] clips, Vector3? pos = null, float volume = 1.0f, float pitch = 1.0f, float pan = 0.0f) {
-        if (clips == null || clips.Length == 0) return;
+    public static GameObject Play(this AudioClip[] clips, Vector3? pos = null, float volume = 1.0f, float pitch = 1.0f, float pan = 0.0f) {
+        if (clips == null || clips.Length == 0) return null;
 
-        clips.Random().Play(pos, volume, pitch, pan);
+        return clips.Random().Play(pos, volume, pitch, pan);
     }
 }

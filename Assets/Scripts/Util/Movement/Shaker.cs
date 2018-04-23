@@ -9,7 +9,7 @@ public class Shaker : MonoBehaviour {
     [Range(1, 10)]
     public int FrameInterval = 1;
 
-	bool frameShaking = true;
+	bool frameShaking ;
 	int framesToShake;
 
     int frameCount;

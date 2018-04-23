@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1462968945221812}
+  m_IsPrefabParent: 1
+--- !u!1 &1462968945221812
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4486913694095666}
+  - component: {fileID: 114323552087192478}
+  m_Layer: 0
+  m_Name: Sounder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4486913694095666
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1462968945221812}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.57983357, y: 0.6931516, z: 9.933375}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114323552087192478
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1462968945221812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a3dac4ab7e979e438134cc436cae233, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WowSound: {fileID: 8300000, guid: 1a85b80643353d8489da3ea02ec98bec, type: 3}
+  GloriousSound: {fileID: 8300000, guid: d327750a4d159f646a597984a37a5bf3, type: 3}
+  LudicrousSound: {fileID: 8300000, guid: 45467db455a58fd4c81c852c5c5fa745, type: 3}
+  QuickSound: {fileID: 8300000, guid: d9882125925830f48af23669118a89ec, type: 3}
+  LongSound: {fileID: 8300000, guid: 555e7b3033a15214a863c699b21feac9, type: 3}
+  SharpshooterSound: {fileID: 8300000, guid: ad0d0d005dfd90246985b0e9416a6692, type: 3}
+  RiskySound: {fileID: 8300000, guid: bf2bd7c14a27b6248beb6f782b12ddd1, type: 3}
+  MoveSound: {fileID: 8300000, guid: 4e5d77a19cab86b40961bfc4bedb61db, type: 3}

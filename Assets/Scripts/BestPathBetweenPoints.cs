@@ -126,7 +126,7 @@ public class BestPathBetweenPointsWorker : IDisposable {
         int pathIndex;
 
         float pathHeuristic(int bucketIndex, int2 dir, int2 optimalDir) {
-            var dirFactor = math.pow(math.max(0, math.csum(math.abs(optimalDir - dir)) - 1), 4) * 2;
+            var dirFactor = math.pow(math.max(0, math.csum(math.abs(optimalDir - dir)) - 1), 4) * 3.5f;
             var entityFactor = BucketEntityCounts[bucketIndex];
             return entityFactor - dirFactor;
         }

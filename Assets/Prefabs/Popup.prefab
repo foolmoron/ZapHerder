@@ -9,56 +9,55 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1357545523346818}
+  m_RootGameObject: {fileID: 1116732189378848}
   m_IsPrefabParent: 1
---- !u!1 &1357545523346818
+--- !u!1 &1116732189378848
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 5
   m_Component:
-  - component: {fileID: 4969993891648170}
-  - component: {fileID: 33339991486467152}
-  - component: {fileID: 23075812762186766}
-  - component: {fileID: 135660673835443218}
-  - component: {fileID: 114785084356898986}
+  - component: {fileID: 4234575035955214}
+  - component: {fileID: 23102603859287482}
+  - component: {fileID: 102601662898906322}
+  - component: {fileID: 114337088554978414}
   m_Layer: 0
-  m_Name: DeathCircle
+  m_Name: Popup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4969993891648170
+--- !u!4 &4234575035955214
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1357545523346818}
+  m_GameObject: {fileID: 1116732189378848}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.5, y: 0.58, z: 10}
-  m_LocalScale: {x: 3, y: 3, z: 1}
+  m_LocalPosition: {x: 3.7791471, y: -2.0810785, z: 10}
+  m_LocalScale: {x: 0.053611904, y: 0.053611916, z: 0.053611916}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &23075812762186766
+--- !u!23 &23102603859287482
 MeshRenderer:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1357545523346818}
+  m_GameObject: {fileID: 1116732189378848}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 0
+  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 4e3420daff48d824aada25d6e10246a7, type: 2}
+  - {fileID: 2100000, guid: bdb2d73b260dc0f4395b7ef9d7dc163e, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -78,61 +77,40 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!33 &33339991486467152
-MeshFilter:
+--- !u!102 &102601662898906322
+TextMesh:
+  serializedVersion: 3
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1357545523346818}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &114785084356898986
+  m_GameObject: {fileID: 1116732189378848}
+  m_Text: 'GOTTA GO FAST
+
+    x2.0'
+  m_OffsetZ: 0
+  m_CharacterSize: 1
+  m_LineSpacing: 1
+  m_Anchor: 4
+  m_Alignment: 1
+  m_TabSize: 4
+  m_FontSize: 96
+  m_FontStyle: 0
+  m_RichText: 1
+  m_Font: {fileID: 12800000, guid: bdb2d73b260dc0f4395b7ef9d7dc163e, type: 3}
+  m_Color:
+    serializedVersion: 2
+    rgba: 4294967295
+--- !u!114 &114337088554978414
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1357545523346818}
+  m_GameObject: {fileID: 1116732189378848}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0957f79de3628ba49a14684dc35d914f, type: 3}
+  m_Script: {fileID: 11500000, guid: f80178a379962574a92fed7c7d8f4edd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TimescaleCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0.49910736
-      inSlope: -1.3964294
-      outSlope: -1.3964294
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.25
-      value: 0.15
-      inSlope: -1.3964294
-      outSlope: -1.3964294
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  FlashInterval: 0.01
-  FlashMaxTime: 0.2
-  WowDeath: 300
-  GloriousDeath: 600
---- !u!135 &135660673835443218
-SphereCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1357545523346818}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
+  FlashInterval: 0.03
+  FlashMaxTime: 0.25
+  DeathTime: 0.7

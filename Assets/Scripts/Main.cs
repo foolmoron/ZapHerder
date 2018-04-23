@@ -19,7 +19,7 @@ public static class Main {
     public static void BeforeSceneLoad() {
         var em = World.Active.GetOrCreateManager<EntityManager>();
 
-        DotArchetype = em.CreateArchetype(typeof(Translate2D), typeof(Rotate2D), typeof(Scale2D), typeof(TransformMatrix));
+        DotArchetype = em.CreateArchetype(typeof(Translate2D), typeof(Rotate2D), typeof(Scale2D), typeof(TransformMatrix), typeof(RandomFlow));
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -50,17 +50,24 @@ public static class Main {
                 //    Amplitude = new float2(0.9f, 0.9f),
                 //    Frequency = new float2(2f, 2f),
                 //});
-                em.AddComponentData(dot, new RandomFlow {
-                    Seed = Random.value,
-                    Origin = em.GetComponentData<Translate2D>(dot).Value,
-                    Interval = 0.5f,
-                    MaxAmplitude = 0.65f,
-                    _Time = 2 + Random.value,
-                });
                 em.AddSharedComponentData(dot, DotDepthLitRenderer);
 
                 Dots[x + y * X] = dot;
             }
+        }
+        SetupRandomDots();
+    }
+
+    public static void SetupRandomDots() {
+        var em = World.Active.GetOrCreateManager<EntityManager>();
+        foreach (var dot in Dots) {
+            em.SetComponentData(dot, new RandomFlow {
+                Seed = Random.value,
+                Origin = em.GetComponentData<Translate2D>(dot).Value,
+                Interval = 0.5f,
+                MaxAmplitude = 0.65f,
+                _Time = Random.value,
+            });
         }
     }
 }

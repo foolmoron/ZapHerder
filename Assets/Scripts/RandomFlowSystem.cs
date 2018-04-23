@@ -25,6 +25,8 @@ public struct RandomFlowReset : IComponentData {
     public float IntervalDecay;
 }
 public class RandomFlowSystem : JobComponentSystem {
+
+    public static bool STOP;
     
     [ComputeJobOptimization]
     struct RandomFlowJob : IJobProcessComponentData<Translate2D, RandomFlow> {
@@ -61,8 +63,9 @@ public class RandomFlowSystem : JobComponentSystem {
     }
 
     protected override JobHandle OnUpdate(JobHandle inputDeps) {
+        var dt = STOP ? 0f : Time.deltaTime;
         var randomreset = new RandomFlowResetJob { }.Schedule(this, 64, inputDeps);
-        var randomflow = new RandomFlowJob { dt = Time.deltaTime }.Schedule(this, 64, JobHandle.CombineDependencies(inputDeps, randomreset));
+        var randomflow = new RandomFlowJob { dt = dt }.Schedule(this, 64, JobHandle.CombineDependencies(inputDeps, randomreset));
         return randomflow;
     }
 }

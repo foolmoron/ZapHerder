@@ -22,6 +22,11 @@ public class Bonus : Manager<Bonus> {
     [Range(0, 1)]
     public float ScaleDecay = 0.5f;
 
+    public GameObject BonusPrefab;
+    public Vector2 PopupMin;
+    public Vector2 PopupMax;
+    public float RotationMax;
+
     float commitDelay;
 
     TextMesh text;
@@ -50,6 +55,11 @@ public class Bonus : Manager<Bonus> {
         Bonuses.Add(bonus);
         var popAmount = bonus.Amount;
         ScaleMultiplier = Mathf.Lerp(MinScalePop, MaxScalePop, popAmount);
+
+        var pos = new Vector3(Mathf.Lerp(PopupMin.x, PopupMax.x, Random.value), Mathf.Lerp(PopupMin.y, PopupMax.y, Random.value), -5f);
+        var rot = Mathf.Lerp(-RotationMax, RotationMax, Random.value);
+        var bonusText = Instantiate(BonusPrefab, pos, Quaternion.Euler(0, 0, rot)).GetComponentInChildren<TextMesh>();
+        bonusText.text = bonus.Name + "\nx" + bonus.Amount.ToString("0.0");
     }
 
     public int GetTotal() {
