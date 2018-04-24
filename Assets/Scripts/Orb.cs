@@ -69,7 +69,7 @@ public class Orb : MonoBehaviour {
     void Update() {
         var em = World.Active.GetExistingManager<EntityManager>();
         // move on click
-        if (Input.GetMouseButtonDown(0)) {
+        if (Input.GetMouseButtonUp(0)) {
             Moving = true;
             moveSound = Sounder.Inst.MoveSound.Play();
             Bonus.Inst.Commit();
