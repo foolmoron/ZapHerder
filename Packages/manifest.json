@@ -1,7 +1,8 @@
 {
   "dependencies": {
-    "com.unity.entities": "0.0.11",
-    "com.unity.postprocessing": "2.0.5-preview"
+    "com.unity.postprocessing": "2.0.5-preview",
+    "com.unity.package-manager-ui": "1.9.3",
+    "com.unity.entities": "0.0.12-preview.2"
   },
   "testables": [
     "com.unity.collections",
